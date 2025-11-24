@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-using DG.Tweening;
+using System.Collections;
 
 public class Card : MonoBehaviour
 {
@@ -22,7 +22,6 @@ public class Card : MonoBehaviour
     {
         if (cardButton == null)
             cardButton = GetComponent<Button>();
-
         cardButton.onClick.AddListener(OnCardClicked);
     }
 
@@ -48,41 +47,77 @@ public class Card : MonoBehaviour
     public void Flip()
     {
         if (isAnimating || IsFlipped) return;
-
         IsFlipped = true;
-        isAnimating = true;
-
-        transform.DORotate(new Vector3(0, 90, 0), 0.15f).OnComplete(() =>
-        {
-            cardImage.sprite = frontSprite;
-            transform.DORotate(new Vector3(0, 0, 0), 0.15f).OnComplete(() =>
-            {
-                isAnimating = false;
-            });
-        });
+        StartCoroutine(FlipAnimation(frontSprite));
     }
 
     public void FlipBack()
     {
         if (isAnimating || !IsFlipped || IsMatched) return;
-
         IsFlipped = false;
-        isAnimating = true;
+        StartCoroutine(FlipAnimation(backSprite));
+    }
 
-        transform.DORotate(new Vector3(0, 90, 0), 0.15f).OnComplete(() =>
+    private IEnumerator FlipAnimation(Sprite targetSprite)
+    {
+        isAnimating = true;
+        float duration = 0.15f;
+        float elapsed = 0f;
+
+        Vector3 startRotation = transform.eulerAngles;
+        Vector3 midRotation = new Vector3(0, 90, 0);
+
+        
+        while (elapsed < duration)
         {
-            cardImage.sprite = backSprite;
-            transform.DORotate(new Vector3(0, 0, 0), 0.15f).OnComplete(() =>
-            {
-                isAnimating = false;
-            });
-        });
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            transform.eulerAngles = Vector3.Lerp(startRotation, midRotation, t);
+            yield return null;
+        }
+
+        transform.eulerAngles = midRotation;
+
+        
+        cardImage.sprite = targetSprite;
+
+        
+        elapsed = 0f;
+        Vector3 endRotation = new Vector3(0, 0, 0);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            transform.eulerAngles = Vector3.Lerp(midRotation, endRotation, t);
+            yield return null;
+        }
+
+        transform.eulerAngles = endRotation;
+        isAnimating = false;
     }
 
     public void SetMatched()
     {
         IsMatched = true;
-        cardImage.DOFade(0.6f, 0.3f);
+        StartCoroutine(FadeAnimation(0.6f, 0.3f));
+    }
+
+    private IEnumerator FadeAnimation(float targetAlpha, float duration)
+    {
+        float elapsed = 0f;
+        Color startColor = cardImage.color;
+        Color endColor = new Color(startColor.r, startColor.g, startColor.b, targetAlpha);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            cardImage.color = Color.Lerp(startColor, endColor, t);
+            yield return null;
+        }
+
+        cardImage.color = endColor;
     }
 
     public void SetFlippedState(bool flipped)
@@ -94,6 +129,6 @@ public class Card : MonoBehaviour
     private void OnDestroy()
     {
         cardButton.onClick.RemoveListener(OnCardClicked);
-        transform.DOKill();
+        StopAllCoroutines();
     }
 }

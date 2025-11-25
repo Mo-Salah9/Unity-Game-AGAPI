@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
@@ -68,6 +68,7 @@ public class GameManager : MonoBehaviour
         matchedPairs = 0;
         totalPairs = (rows * columns) / 2;
         flippedCards.Clear();
+        isProcessing = false;  
 
         scoreSystem.ResetScore();
 
@@ -79,6 +80,8 @@ public class GameManager : MonoBehaviour
         {
             card.OnCardFlipped += HandleCardFlipped;
         }
+
+        saveSystem.ClearSaveData();  
     }
 
     public void HandleCardFlipped(Card card)

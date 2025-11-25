@@ -178,19 +178,31 @@ public class GameManager : MonoBehaviour
         List<Card> cards = boardManager.CreateBoard(cardPrefab, boardParent, boardContainer,
             rows, columns, data.cardIds, cardSprites, cardBackSprite);
 
+        flippedCards.Clear();
+
         for (int i = 0; i < cards.Count; i++)
         {
             cards[i].OnCardFlipped += HandleCardFlipped;
 
-            if (data.cardStates[i].isFlipped)
-            {
-                cards[i].Flip();
-            }
-
             if (data.cardStates[i].isMatched)
             {
+                cards[i].SetFlippedState(true);
                 cards[i].SetMatched();
             }
+            else if (data.cardStates[i].isFlipped)
+            {
+                cards[i].SetFlippedState(true);
+                flippedCards.Add(cards[i]);
+            }
+        }
+
+        if (flippedCards.Count == 2)
+        {
+            CheckForMatch();
+        }
+        else if (flippedCards.Count == 1)
+        {
+            isProcessing = false;
         }
     }
 

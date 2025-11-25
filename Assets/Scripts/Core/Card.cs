@@ -124,6 +124,8 @@ public class Card : MonoBehaviour
     {
         IsFlipped = flipped;
         cardImage.sprite = flipped ? frontSprite : backSprite;
+        transform.rotation = Quaternion.identity;
+
     }
 
     private void OnDestroy()

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -83,7 +84,10 @@ public class GameManager : MonoBehaviour
 
         saveSystem.ClearSaveData();  
     }
-
+    public void Reset()
+    {
+        SceneManager.LoadScene(0);
+    }
     public void HandleCardFlipped(Card card)
     {
         if (isProcessing || card.IsMatched || flippedCards.Contains(card))

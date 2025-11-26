@@ -81,7 +81,7 @@ public class UIManager : MonoBehaviour
         if (gameOverPanel != null)
             gameOverPanel.SetActive(false);
 
-        GameManager.Instance.StartNewGame();
+        GameManager.Instance.Reset();
     }
 
     private void OnDestroy()
